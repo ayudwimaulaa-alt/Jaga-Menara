@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JAGA MENARA — Jelajah Angka di Kota Menara</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<!-- Script Canvas Confetti untuk Animasi Kembang Api -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+  :root {
+    --bg-dark: #070d19;
+    --cyan: #00f2fe;
+    --cyan-dim: #0891a8;
+    --gold: #ffb703;
+    --emerald: #00d68f;
+    --crimson: #ff3b5c;
+    --card-blue: #1e6fff;
+    --card-green: #00c97a;
+    --card-red: #ff4d6d;
+    --text: #eaf6ff;
+  }
+
+  * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+  html, body {
+    height: 100%; margin: 0; overflow-x: hidden;
+    background: url('HOME.png') no-repeat center center fixed;
+    background-size: cover;
+    color: var(--text);
+  }
+
+  .body-overlay {
+    min-height: 100vh;
+    background: rgba(7, 13, 25, 0.75);
+    backdrop-filter: blur(4px);
+  }
+
+  /* NAVBAR GLOBAL */
+  .global-nav {
+    position: fixed; top: 0; left: 0; right: 0; height: 60px;
+    background: rgba(7, 13, 25, 0.9); backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 242, 254, 0.2); z-index: 100;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+  }
+  .nav-brand { font-weight: 900; color: var(--gold); font-size: 16px; letter-spacing: 0.5px; cursor: pointer; }
+  .nav-menu { display: flex; gap: 8px; }
+  .nav-btn {
+    background: rgba(0, 242, 254, 0.1); border: 1px solid var(--cyan-dim); color: var(--cyan);
+    padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .nav-btn:hover { background: var(--cyan); color: #000; }
+  .nav-btn-home {
+    background: linear-gradient(135deg, var(--gold), #d97706);
+    color: #000; border: none;
+  }
+  .nav-btn-home:hover { background: var(--gold); filter: brightness(1.1); color: #000; }
+
+  /* HALAMAN UTAMA (HERO SCREEN) */
+  .landing-hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px 40px;
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+  }
+  
+  .landing-card {
+    background: rgba(8, 17, 36, 0.88);
+    border: 2px solid var(--cyan);
+    border-radius: 24px;
+    padding: 36px 24px;
+    max-width: 680px;
+    width: 100%;
+    box-shadow: 0 0 35px rgba(0, 242, 254, 0.3);
+    backdrop-filter: blur(8px);
+  }
+
+  .landing-badge {
+    display: inline-block;
+    background: rgba(255, 183, 3, 0.2);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 800;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    letter-spacing: 1.5px;
+  }
+
+  .landing-title {
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin: 0 0 10px;
+    line-height: 1.2;
+    text-shadow: 0 0 15px rgba(255, 183, 3, 0.4);
+  }
+
+  .landing-subtitle {
+    font-size: 18px;
+    color: var(--cyan);
+    font-weight: 700;
+    margin-bottom: 28px;
+  }
+
+  .btn-start-hero {
+    background: linear-gradient(135deg, var(--gold), #f59e0b);
+    color: #070d19;
+    font-size: 18px;
+    font-weight: 900;
+    padding: 16px 36px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(255, 183, 3, 0.4);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn-start-hero:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(255, 183, 3, 0.6);
+    filter: brightness(1.1);
+  }
+
+  /* CONTAINER POS */
+  .main-content { padding-top: 75px; min-height: 100vh; padding-bottom: 30px; }
+  .pos-section { display: none; padding: 16px; max-width: 950px; margin: 0 auto; }
+  .pos-section.active { display: block; animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .pos-card {
+    background: rgba(13, 24, 48, 0.92); border: 1px solid rgba(0, 242, 254, 0.35);
+    border-radius: 20px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); margin-bottom: 20px;
+  }
+  .pos-title { font-size: 22px; font-weight: 900; color: var(--gold); margin-bottom: 8px; }
+  .pos-subtitle { font-size: 13px; color: var(--cyan); font-weight: 700; text-transform: uppercase; margin-bottom: 16px; letter-spacing: 1px; }
+
+  /* MAP NAVIGATION */
+  .map-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .map-node {
+    background: rgba(10, 23, 48, 0.9); border: 1.5px solid var(--cyan-dim); border-radius: 12px;
+    padding: 12px; text-align: center; cursor: pointer; transition: all 0.2s;
+  }
+  .map-node:hover, .map-node.active { border-color: var(--gold); background: rgba(255, 183, 3, 0.2); }
+  .map-node .num { font-size: 11px; color: var(--cyan); font-weight: 800; text-transform: uppercase; }
+  .map-node .label { font-size: 13px; font-weight: 800; color: var(--text); margin-top: 2px; }
+
+  /* VIDEO CONTAINER */
+  .video-container {
+    width: 100%; border-radius: 16px; overflow: hidden; background: #000;
+    border: 2px solid var(--cyan-dim); position: relative; margin: 15px 0;
+  }
+  video { width: 100%; height: auto; max-height: 450px; display: block; }
+  .upload-box {
+    background: rgba(0, 242, 254, 0.05); border: 1px dashed var(--cyan-dim);
+    border-radius: 12px; padding: 12px; text-align: center; margin-bottom: 12px;
+  }
+
+  /* MATERI & LKPD BOX */
+  .materi-box {
+    background: rgba(8, 18, 39, 0.9); border: 1px solid rgba(0, 242, 254, 0.3);
+    border-radius: 14px; padding: 16px; margin-bottom: 16px;
+  }
+  .materi-box h4 { margin: 0 0 8px; color: var(--gold); font-size: 16px; }
+  .math-calc {
+    background: #040914; border: 1px solid var(--cyan-dim); border-radius: 8px;
+    padding: 10px 14px; font-family: monospace; color: #38bdf8; font-size: 14px; line-height: 1.6;
+  }
+  .iframe-wrapper {
+    width: 100%; height: 680px; border-radius: 16px; border: 2px solid var(--cyan);
+    overflow: hidden; background: #000; margin-top: 15px; box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+  }
+
+  /* GAME & KUIS POS STYLES */
+  .screen { display: none; }
+  .screen.active { display: flex; flex-direction: column; }
+  #screen-setup { align-items: center; justify-content: center; padding: 10px; }
+  .setup-box {
+    width: 100%; max-width: 520px; background: rgba(8, 17, 36, 0.95);
+    border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 20px; padding: 20px; text-align: center; position: relative;
+  }
+  .field { margin: 12px 0; text-align: left; }
+  .field label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px; font-weight: 700; text-transform: uppercase; }
+  .field select, .field input {
+    width: 100%; padding: 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12);
+    background: #060e1e; color: var(--text); font-size: 13px; font-weight: 600; outline: none;
+  }
+  #teamNamesWrap { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .btn-main {
+    margin-top: 16px; width: 100%; padding: 12px; border: none; border-radius: 12px;
+    background: linear-gradient(135deg, var(--cyan), #0066ff); color: #001026;
+    font-weight: 800; font-size: 14px; cursor: pointer; transition: transform 0.1s, filter 0.2s;
+  }
+  .btn-main:active { transform: scale(0.98); }
+  .btn-main:hover { filter: brightness(1.1); }
+  
+  .lock-corner {
+    position: absolute; top: 15px; right: 15px; width: 32px; height: 32px;
+    border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--gold);
+    color: var(--gold); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+
+  .arena-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 1px solid rgba(0,242,254,0.25); }
+  .arena-title { font-size: 18px; font-weight: 800; color: var(--gold); }
+  .timer-box { font-size: 22px; font-weight: 900; color: var(--cyan); background: rgba(0,242,254,0.1); padding: 4px 12px; border-radius: 8px; border: 1px solid var(--cyan-dim); }
+  .btn-pause { background: linear-gradient(135deg, var(--gold), #d97706); color: #000; border: none; font-weight: 800; border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 12px; }
+  .btn-pause:hover { filter: brightness(1.1); }
+  .leaderboard { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .team-chip { background: #0a1730; border: 1px solid var(--gold); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 700; color: var(--gold); }
+  
+  /* GRID VAULT */
+  .grid-vault { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; }
+  @media (max-width: 768px) { .grid-vault { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 480px) { .grid-vault { grid-template-columns: repeat(2, 1fr); } }
+
+  .vault-card {
+    min-height: 85px; border-radius: 14px; background: linear-gradient(160deg, #101d3d, #0a1428);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; border: 2px solid var(--card-blue); position: relative; padding: 8px 4px;
+    transition: all 0.2s ease-in-out; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .vault-card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,242,254,0.3); }
+  .vault-card.grp-sedang { border-color: var(--card-green); }
+  .vault-card.grp-sulit { border-color: var(--card-red); }
+  .vault-card .num { font-size: 16px; font-weight: 900; color: var(--text); }
+  .vault-card .pts { font-size: 11px; color: var(--gold); font-weight: 800; margin-top: 2px; text-align: center; line-height: 1.2; word-break: break-word; }
+  .vault-card.locked { 
+    opacity: 0.95; border-color: var(--gold) !important; 
+    background: linear-gradient(160deg, #241a05, #120d02); 
+    cursor: default; transform: none !important;
+  }
+
+  .instruction-box {
+    background: rgba(0, 242, 254, 0.05); border: 1px solid var(--cyan-dim);
+    border-radius: 12px; padding: 14px 16px; margin: 15px 0; text-align: left;
+  }
+  .instruction-title { font-size: 14px; font-weight: 800; color: var(--gold); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .instruction-list { margin: 0; padding-left: 18px; font-size: 12.5px; color: #cbd5e1; line-height: 1.6; }
+
+  /* PAPAN SKOR AKHIR */
+  .score-board-final {
+    background: rgba(8, 17, 36, 0.95);
+    border: 2px solid var(--gold);
+    border-radius: 20px;
+    padding: 24px;
+    text-align: center;
+    box-shadow: 0 0 35px rgba(255, 183, 3, 0.3);
+    margin-top: 15px;
+    animation: fadeIn 0.5s ease;
+  }
+  .rank-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    margin: 8px 0;
+    border-radius: 12px;
+    background: rgba(10, 23, 48, 0.8);
+    border: 1px solid rgba(0, 242, 254, 0.2);
+    font-weight: 800;
+  }
+  .rank-1 { border-color: var(--gold); background: rgba(255, 183, 3, 0.15); font-size: 16px; color: var(--gold); }
+  .rank-2 { border-color: #c0c0c0; background: rgba(192, 192, 192, 0.1); font-size: 15px; color: #e2e8f0; }
+  .rank-3 { border-color: #cd7f32; background: rgba(205, 127, 50, 0.1); font-size: 14px; color: #cbd5e1; }
+
+  /* MODAL STYLES */
+  .overlay { position: fixed; inset: 0; background: rgba(2,6,18,0.85); display: none; align-items: center; justify-content: center; z-index: 200; padding: 16px; backdrop-filter: blur(5px); }
+  .overlay.active { display: flex; }
+  .modal-card { width: min(460px, 94vw); background: #0a1428; border: 2px solid var(--cyan); border-radius: 16px; padding: 18px; box-shadow: 0 0 30px rgba(0, 242, 254, 0.25); }
+  .soal-box { background: #081227; border: 1px solid var(--cyan-dim); border-radius: 10px; padding: 12px; font-size: 13.5px; line-height: 1.5; margin-bottom: 12px; color: #e2e8f0; }
+  .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0; }
+  .keypad button { padding: 12px; border-radius: 10px; border: 1px solid var(--cyan-dim); background: #0a1730; color: var(--text); font-size: 16px; cursor: pointer; font-weight: 800; transition: background 0.15s; }
+  .keypad button:active { background: var(--cyan-dim); }
+
+  /* REFLEKSI FORM & SERTIFIKAT */
+  .form-group { margin-bottom: 14px; text-align: left; }
+  .form-group label { display: block; font-size: 12px; color: var(--cyan); font-weight: 700; margin-bottom: 6px; }
+  .form-group textarea, .form-group input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--cyan-dim); background: #060e1e; color: #fff; font-size: 13px; }
+  .emoji-selector { display: flex; gap: 10px; }
+  .emoji-btn { font-size: 24px; padding: 8px 14px; border: 1px solid var(--cyan-dim); border-radius: 10px; cursor: pointer; background: #0a1730; transition: all 0.2s; }
+  .emoji-btn.selected { border-color: var(--gold); background: rgba(255,183,3,0.25); transform: scale(1.05); }
+
+  .certificate-card {
+    background: #fff; color: #1e293b; padding: 24px; border-radius: 12px; border: 8px double #d97706; text-align: center; margin-top: 15px; display: none;
+  }
+  .certificate-card h2 { font-family: serif; color: #92400e; margin: 4px 0; font-size: 22px; }
+</style>
+</head>
+<body>
+
+<div class="body-overlay">
+  <!-- GLOBAL NAVBAR -->
+  <div class="global-nav">
+    <div class="nav-brand" onclick="showHome()">🏰 JAGA MENARA</div>
+    <div class="nav-menu">
+      <button class="nav-btn nav-btn-home" onclick="showHome()">🏠 Home</button>
+      <button class="nav-btn" onclick="openModal('modalCPTP')">📋 CP & TP</button>
+      <button class="nav-btn" onclick="openModal('modalPetunjuk')">❓ Petunjuk</button>
+    </div>
+  </div>
+
+  <!-- HALAMAN UTAMA (HERO SCREEN) -->
+  <div class="landing-hero" id="homePage">
+    <div class="landing-card">
+      <div class="landing-badge">MEDIA PEMBELAJARAN INTERAKTIF</div>
+      <h1 class="landing-title">JAGA MENARA</h1>
+      <div class="landing-subtitle">Jelajah Angka di Kota Menara</div>
+      <button class="btn-start-hero" onclick="startApp()">
+        🚀 MULAI PETUALANGAN
+      </button>
+    </div>
+  </div>
+
+  <!-- CONTAINER POS PEMBELAJARAN -->
+  <div class="main-content" id="posContainer" style="display: none;">
+    <!-- PETA NAVIGASI POS -->
+    <div style="max-width: 950px; margin: 0 auto; padding: 0 16px;">
+      <div class="map-grid">
+        <div class="map-node active" id="node-1" onclick="switchPos(1)"><div class="num">Pos 1</div><div class="label">🎬 Lacak Masalah</div></div>
+        <div class="map-node" id="node-2" onclick="switchPos(2)"><div class="num">Pos 2</div><div class="label">🔑 Kunci Rahasia</div></div>
+        <div class="map-node" id="node-3" onclick="switchPos(3)"><div class="num">Pos 3</div><div class="label">🎯 Arena Kuis</div></div>
+        <div class="map-node" id="node-4" onclick="switchPos(4)"><div class="num">Pos 4</div><div class="label">✨ Refleksi</div></div>
+      </div>
+    </div>
+
+    <!-- POS 1: LACAK MASALAH -->
+    <div class="pos-section active" id="pos-1">
+      <div class="pos-card">
+        <div class="pos-title">Pos 1: Lacak Masalah</div>
+        <div class="pos-subtitle">Kearifan Lokal Kudus — Toko Oleh-oleh Gusjigang</div>
+        
+        <p style="font-size: 14px; line-height: 1.6; color: #cbd5e1;">
+          Simak video pemantik kisah Toko Oleh-oleh Gusjigang Kudus! Mereka sedang menghitung sisa stok Jenang Kudus yang belum terjual.
+        </p>
+
+        <div class="upload-box">
+          <label style="font-size:12px; color:var(--cyan); font-weight:700; display:block; margin-bottom:6px;">
+            📁 Unggah Video Pemantik (.mp4) Dari Perangkat Anda:
+          </label>
+          <input type="file" id="videoUploader" accept="video/mp4,video/*" onchange="loadLocalVideo(event)" style="font-size:12px; color:#fff;">
+        </div>
+
+        <div class="video-container">
+          <video id="videoPemantik" controls poster="HOME.png">
+            <source src="video_pemantik.mp4" type="video/mp4">
+            Browser Anda tidak mendukung pemutar video HTML5.
+          </video>
+        </div>
+
+        <button class="btn-main" onclick="switchPos(2)" style="margin-top: 15px;">Lanjut ke Pos 2 (Kunci Rahasia) ➔</button>
+      </div>
+    </div>
+
+    <!-- POS 2: KUNCI RAHASIA & SIMULATOR -->
+    <div class="pos-section" id="pos-2">
+      <div class="pos-card">
+        <div class="pos-title">Pos 2: Kunci Rahasia — Penyelesaian & Konsep Pengurangan</div>
+        <div class="pos-subtitle">Materi Pengurangan Biasa, Pengurangan Meminjam, & Simulator Tajug Block</div>
+        
+        <div class="materi-box" style="border-left: 4px solid var(--gold);">
+          <h4>📌 Penyelesaian Masalah Video Pemantik (Stok Jenang Kudus)</h4>
+          <p style="font-size: 13px; line-height: 1.6; color: #cbd5e1; margin-bottom: 10px;">
+            <b>Soal Pemantik:</b> Toko Gusjigang menyiapkan <b>236 bungkus</b> Jenang Kudus. Hingga sore hari, telah terjual <b>118 bungkus</b>. Berapakah sisa jenang yang belum terjual?
+          </p>
+          <div class="math-calc">
+            <b>Kalimat Matematika:</b> 236 - 118 = ...<br><br>
+            <b>1. Diketahui & Ditanyakan:</b><br>
+            • Stok awal = 236 bungkus<br>
+            • Terjual = 118 bungkus<br>
+            • Sisa jenang = 236 - 118<br><br>
+            <b>2. Pengurangan Bersusun (Teknik Pinjam):</b><br>
+            &nbsp;&nbsp;236<br>
+            &nbsp;&nbsp;118<br>
+            &nbsp;&nbsp;--- (-)<br>
+            &nbsp;&nbsp;<b>118</b><br><br>
+            <b>3. Langkah Pengurangan:</b><br>
+            • <b>Satuan:</b> 6 kurang dari 8, pinjam 1 puluhan dari angka 3 (angka 3 tersisa 2, satuan menjadi 16) ➔ 16 - 8 = <b>8</b><br>
+            • <b>Puluhan:</b> Sisa 2 puluhan dikurangi 1 ➔ 2 - 1 = <b>1</b><br>
+            • <b>Ratusan:</b> 2 ratusan dikurangi 1 ➔ 2 - 1 = <b>1</b><br><br>
+            <b>Kesimpulan:</b> Sisa Jenang Kudus yang belum terjual adalah <b>118 bungkus</b>.
+          </div>
+        </div>
+
+        <div class="materi-box" style="border-left: 4px solid var(--cyan);">
+          <h4>1️⃣ Pengurangan Biasa (Tanpa Meminjam)</h4>
+          <p style="font-size: 13px; line-height: 1.6; color: #cbd5e1;">
+            Pengurangan dilakukan langsung dari nilai tempat terkecil (Satuan), lalu Puluhan, kemudian Ratusan.
+          </p>
+          <div class="math-calc">
+            Contoh: <b>378 - 256 = ...</b><br>
+            • Satuan : 8 - 6 = 2<br>
+            • Puluhan: 7 - 5 = 2<br>
+            • Ratusan: 3 - 2 = 1<br>
+            <b>Hasil = 122</b>
+          </div>
+        </div>
+
+        <div class="materi-box" style="border-left: 4px solid var(--crimson);">
+          <h4>2️⃣ Pengurangan Meminjam (Regrouping)</h4>
+          <p style="font-size: 13px; line-height: 1.6; color: #cbd5e1;">
+            Jika angka pada nilai tempat tertentu (misal Satuan) <b>lebih kecil</b> daripada angka pengurangnya, maka harus <b>meminjam 1 nilai di depannya</b>.
+          </p>
+          <div class="math-calc">
+            Contoh: <b>236 - 118 = ...</b><br>
+            • Satuan : 16 - 8 = <b>8</b> (setelah pinjam 1 puluhan)<br>
+            • Puluhan: 2 - 1 = <b>1</b><br>
+            • Ratusan: 2 - 1 = <b>1</b><br>
+            <b>Hasil = 118</b>
+          </div>
+        </div>
+
+        <div style="margin-top: 25px;">
+          <h3 style="color: var(--gold); font-size: 18px; font-weight: 800; margin-bottom: 6px;">
+            🎮 Media Pembelajaran Interaktif: Tajug Block
+          </h3>
+          <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 12px;">
+            Gunakan alat peraga digital di bawah ini untuk mensimulasikan blok Ratusan, Puluhan, dan Satuan serta mempraktikkan proses tukar/meminjam blok!
+          </p>
+          
+          <div class="iframe-wrapper">
+            <iframe id="tajugFrame" style="width:100%; height:100%; border:none;"></iframe>
+          </div>
+        </div>
+
+        <button class="btn-main" onclick="switchPos(3)" style="margin-top: 25px;">Lanjut ke Pos 3 (Arena Kuis) ➔</button>
+      </div>
+    </div>
+
+    <!-- POS 3: ARENA KUIS BRANKAS DIGITAL -->
+    <div class="pos-section" id="pos-3">
+      <div class="pos-card">
+        <!-- SETUP ARENA -->
+        <div id="screen-setup" class="screen active">
+          <div class="setup-box">
+            <button type="button" class="lock-corner" onclick="openTeacherModal()" title="Kunci Guru">🔒</button>
+            <div style="color:var(--gold); font-size:11px; font-weight:800; letter-spacing:1px; margin-bottom:4px;">ARENA GAME INTERAKTIF</div>
+            <div style="font-size:20px; font-weight:900; color:#fff;">BRANKAS DIGITAL KOTA MENARA</div>
+            
+            <div class="field">
+              <label>JUMLAH TIM (MAKSIMAL 6 TIM)</label>
+              <select id="inpJumlahTim" onchange="renderTeamNameInputs()">
+                <option value="2">2 Tim</option>
+                <option value="3">3 Tim</option>
+                <option value="4" selected>4 Tim</option>
+                <option value="5">5 Tim</option>
+                <option value="6">6 Tim</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>NAMA TIM</label>
+              <div id="teamNamesWrap"></div>
+            </div>
+            <div class="field">
+              <label>DURASI WAKTU (MENIT)</label>
+              <input type="number" id="inpDurasi" value="15" min="1" max="60">
+            </div>
+            <button type="button" class="btn-main" onclick="mulaiPermainan()">🚀 MULAI TANTANGAN BRANKAS</button>
+          </div>
+        </div>
+
+        <!-- MAIN ARENA -->
+        <div id="screen-arena" class="screen">
+          <div class="arena-header">
+            <div class="arena-title">🏙 Arena Brankas Kudus</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div class="timer-box" id="timerDisplay">15:00</div>
+              <button type="button" class="btn-pause" id="btnPauseTimer" onclick="togglePauseTimer()">⏸ Jeda</button>
+            </div>
+            <button type="button" class="nav-btn" onclick="openTeacherModal()">🔑 Guru</button>
+            <div class="leaderboard" id="leaderboard"></div>
+          </div>
+
+          <div class="instruction-box">
+            <div class="instruction-title">📌 Petunjuk Pengerjaan Soal Kuis Brankas:</div>
+            <ol class="instruction-list">
+              <li>Pilih salah satu nomor <b>Brankas Digital</b> yang tersedia di papan arena.</li>
+              <li>Baca dan diskusikan soal cerita matematika mengenai konteks kebudayaan Kudus bersama tim.</li>
+              <li>Hitung jawaban akhir berupa angka (contoh: <b>122</b>) menggunakan lembar coretan atau bantuan media.</li>
+              <li>Pilih nama tim kalian pada menu drop-down di dalam jendela brankas.</li>
+              <li>Masukkan jawaban angka sebagai kode kombinasi password brankas menggunakan keypad layar, lalu tekan tombol <b>🔓 Buka / ✔</b>.</li>
+              <li>Jika jawaban tepat, akses akan diizinkan (disertai suara kemenangan) dan tim memperoleh <b>20 Poin</b>!</li>
+            </ol>
+          </div>
+
+          <div class="grid-vault" id="gridVault"></div>
+          <button class="btn-main" onclick="selesaiKuisAtauSelesaiWaktu()" style="margin-top:20px; background:linear-gradient(135deg, var(--emerald), #00a86b);">Selesai Kuis & Lihat Hasil Match 🏆</button>
+        </div>
+
+        <!-- REKAP/PAPAN SKOR FINAL GAME RESULT -->
+        <div id="screen-result" class="screen">
+          <div class="score-board-final">
+            <div style="font-size:36px; margin-bottom:8px;">🏆</div>
+            <h2 style="color:var(--gold); margin:0 0 6px; font-weight:900; font-size:24px;">PAPAN SKOR HASIL PERTANDINGAN</h2>
+            <p style="color:var(--cyan); font-size:13px; font-weight:700; margin-bottom:20px;">Waktu pengerjaan kuis telah berakhir!</p>
+            
+            <div id="finalLeaderboardList"></div>
+
+            <button class="btn-main" onclick="switchPos(4)" style="margin-top:24px; background:linear-gradient(135deg, var(--emerald), #00a86b); font-size:16px;">
+              ✨ Lanjut ke Pos 4 (Refleksi) ➔
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- POS 4: REFLEKSI PEMBELAJARAN -->
+    <div class="pos-section" id="pos-4">
+      <div class="pos-card">
+        <div class="pos-title">Pos 4: Refleksi Pembelajaran</div>
+        <div class="pos-subtitle">Ulasan Belajar & Penghargaan Tim</div>
+        
+        <div class="form-group">
+          <label>1. Bagaimana Perasaanmu Setelah Menjelajahi Misi Hari Ini?</label>
+          <div class="emoji-selector">
+            <div class="emoji-btn" onclick="selectEmoji(this, 'Sangat Senang')">😃</div>
+            <div class="emoji-btn" onclick="selectEmoji(this, 'Paham')">🙂</div>
+            <div class="emoji-btn" onclick="selectEmoji(this, 'Perlu Belajar Lagi')">🤔</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>2. Nama Siswa / Ketua Kelompok:</label>
+          <input type="text" id="refNama" placeholder="Tuliskan nama lengkapmu...">
+        </div>
+
+        <div class="form-group">
+          <label>3. Apa bagian paling menarik dari pembelajaran hari ini?</label>
+          <textarea id="refPesan" rows="3" placeholder="Contoh: Bagian paling menarik adalah saat membuka brankas digital bersama kelompok..."></textarea>
+        </div>
+
+        <button class="btn-main" onclick="generateSertifikat()">✨ Simpan Refleksi & Terbitkan Sertifikat</button>
+
+        <div class="certificate-card" id="certCard">
+          <p style="font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #78350f; font-weight: 800; margin: 0;">Sertifikat Penghargaan</p>
+          <h2>PETUALANG MATEMATIKA</h2>
+          <p style="font-size: 12px; color: #475569; margin: 4px 0;">Diberikan Kepada:</p>
+          <h3 id="certNama" style="color: #1e3a8a; font-size: 20px; margin: 6px 0; border-bottom: 2px solid #cbd5e1; display: inline-block; padding: 0 15px;">-</h3>
+          <p style="font-size: 12px; color: #334155; line-height: 1.5; margin-top: 8px;">
+            Telah berhasil menyelesaikan seluruh rangkaian Misi <b>JAGA MENARA</b> (Jelajah Angka di Kota Menara) materi Pengurangan dalam Kehidupan Sehari-hari.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL POPUP: CP & TP -->
+<div class="overlay" id="modalCPTP">
+  <div class="modal-card">
+    <h3 style="color:var(--gold); margin-top:0;">📋 Capaian & Tujuan Pembelajaran</h3>
+    <b style="color:var(--cyan); font-size:12px;">Capaian Pembelajaran (CP):</b>
+    <p style="font-size:12px; color:#cbd5e1; line-height:1.4;">Pada akhir Fase A, murid dapat melakukan operasi penjumlahan dan pengurangan pada bilangan cacah sampai 20.</p>
+    <b style="color:var(--cyan); font-size:12px;">Tujuan Pembelajaran (TP):</b>
+    <p style="font-size:12px; color:#cbd5e1; line-height:1.4;">Melalui media interaktif JAGA MENARA, murid mampu menyelesaikan masalah sehari-hari yang berkaitan dengan pengurangan bilangan cacah dengan tepat.</p>
+    <button class="btn-main" onclick="closeModal('modalCPTP')">Tutup</button>
+  </div>
+</div>
+
+<!-- MODAL POPUP: PETUNJUK -->
+<div class="overlay" id="modalPetunjuk">
+  <div class="modal-card">
+    <h3 style="color:var(--gold); margin-top:0;">❓ Petunjuk Petualangan</h3>
+    <p style="font-size:12px; color:#cbd5e1; line-height:1.5;">Ikuti alur pos dari Pos 1 hingga Pos 4 secara berurutan bersama kelompokmu untuk menyelesaikan misi!</p>
+    <button class="btn-main" onclick="closeModal('modalPetunjuk')">Mengerti</button>
+  </div>
+</div>
+
+<!-- MODAL KUIS: INPUT PASSWORD BRANKAS -->
+<div class="overlay" id="modalPassword">
+  <div class="modal-card">
+    <h3 id="modalPassTitle" style="color:var(--gold); margin:0 0 8px;">BRANKAS</h3>
+    <div class="soal-box" id="modalSoalText"></div>
+    <div style="margin-bottom:8px;">
+      <label style="font-size:11px; color:var(--cyan); font-weight:700;">Pilih Tim Menjawab:</label>
+      <select id="selectTimJawab" style="width:100%; padding:8px; border-radius:8px; background:#060e1e; color:#fff; border:1px solid var(--cyan-dim); margin-top:4px; font-weight:600;"></select>
+    </div>
+    <input type="text" id="inputPassword" readonly placeholder="Klik angka di bawah..." style="width:100%; padding:10px; border-radius:8px; background:#000; color:var(--gold); font-size:20px; text-align:center; font-weight:800; margin-bottom:8px; border:1px solid var(--cyan-dim);">
+    <div class="keypad" id="keyboardArea"></div>
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      <button class="btn-main" style="background:var(--emerald); flex:1; margin-top:0;" onclick="cekJawaban()">🔓 Buka</button>
+      <button class="btn-main" style="background:#334155; flex:1; margin-top:0;" onclick="closeModal('modalPassword')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL STATUS JAWABAN KUIS FEEDBACK -->
+<div class="overlay" id="modalQuizFeedback">
+  <div class="modal-card" style="text-align: center; max-width: 380px;">
+    <div id="quizFeedbackIcon" style="width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 26px;"></div>
+    <h3 id="quizFeedbackTitle" style="font-size: 20px; font-weight: 900; color: #fff; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 1px;"></h3>
+    <p id="quizFeedbackMsg" style="font-size: 13px; color: #cbd5e1; margin-bottom: 18px; line-height: 1.5;"></p>
+    <button class="btn-main" id="btnCloseQuizFeedback" style="margin-top: 0;" onclick="closeModal('modalQuizFeedback')">Mengerti</button>
+  </div>
+</div>
+
+<!-- MODAL GURU -->
+<div class="overlay" id="modalGuru">
+  <div class="modal-card">
+    <h3 style="color:var(--gold); margin-top:0;">🔑 Kunci Jawaban Guru</h3>
+    <input type="password" id="inputGuruPw" placeholder="Password (1234)" style="width:100%; padding:8px; border-radius:8px; background:#000; color:#fff; margin-bottom:8px; border:1px solid var(--cyan-dim);">
+    <button class="btn-main" style="margin-top:0;" onclick="cekPasswordGuru()">Masuk</button>
+    <div id="answerListArea" style="margin-top:10px; font-size:11px; max-height:200px; overflow-y:auto; display:none; background:#060e1e; padding:8px; border-radius:8px;"></div>
+    <button class="btn-main" style="background:#334155; margin-top:8px;" onclick="closeModal('modalGuru')">Tutup</button>
+  </div>
+</div>
+
+<script>
+/* SINTESIS EFEK SUARA DAN NADA KEMANANGAN / KEKALAHAN */
+let globalAudioCtx = null;
+
+function initGlobalAudio() {
+  if (!globalAudioCtx) {
+    globalAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (globalAudioCtx.state === 'suspended') {
+    globalAudioCtx.resume();
+  }
+}
+
+function playGlobalBtnSound(type = 'click') {
+  try {
+    initGlobalAudio();
+    const osc = globalAudioCtx.createOscillator();
+    const gain = globalAudioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(globalAudioCtx.destination);
+    const now = globalAudioCtx.currentTime;
+
+    if (type === 'click') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(500, now);
+      osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    } else if (type === 'key') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(650, now);
+      osc.frequency.exponentialRampToValueAtTime(950, now + 0.06);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.06);
+      osc.start(now);
+      osc.stop(now + 0.06);
+    } else if (type === 'pause') {
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(400, now);
+      osc.frequency.setValueAtTime(300, now + 0.08);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.16);
+      osc.start(now);
+      osc.stop(now + 0.16);
+    } else if (type === 'resume') {
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.setValueAtTime(500, now + 0.08);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.16);
+      osc.start(now);
+      osc.stop(now + 0.16);
+    } else if (type === 'correct') {
+      // Terompet Kemenangan (Fanfare Melodius)
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      notes.forEach((freq, idx) => {
+        const noteOsc = globalAudioCtx.createOscillator();
+        const noteGain = globalAudioCtx.createGain();
+        noteOsc.type = 'triangle';
+        noteOsc.frequency.setValueAtTime(freq, now + (idx * 0.12));
+        noteGain.gain.setValueAtTime(0.25, now + (idx * 0.12));
+        noteGain.gain.linearRampToValueAtTime(0.01, now + (idx * 0.12) + 0.25);
+        noteOsc.connect(noteGain);
+        noteGain.connect(globalAudioCtx.destination);
+        noteOsc.start(now + (idx * 0.12));
+        noteOsc.stop(now + (idx * 0.12) + 0.25);
+      });
+    } else if (type === 'wrong') {
+      // Nada Ditolak / Akses Gagal
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.setValueAtTime(180, now + 0.15);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+// Menambahkan pemicu audio klik ke semua tombol
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('button, .map-node, .emoji-btn, .vault-card, .nav-brand');
+  if (btn) {
+    if (btn.classList.contains('vault-card')) {
+      playGlobalBtnSound('click');
+    } else if (btn.parentElement && btn.parentElement.classList.contains('keypad')) {
+      playGlobalBtnSound('key');
+    } else {
+      playGlobalBtnSound('click');
+    }
+  }
+});
+
+/* FUNGSI NAVIGASI HALAMAN UTAMA (HOME) & POS */
+function startApp() {
+  document.getElementById('homePage').style.display = 'none';
+  document.getElementById('posContainer').style.display = 'block';
+  switchPos(1);
+}
+
+function showHome() {
+  document.getElementById('posContainer').style.display = 'none';
+  document.getElementById('homePage').style.display = 'flex';
+  window.scrollTo(0, 0);
+}
+
+/* INJEKSI SOURCE TAJUG BLOCK KE IFRAME POS 2 */
+const tajugBlockSource = `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAJUG BLOCK</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"><\/script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; user-select: none; -webkit-user-select: none; }
+        body { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%); overflow: hidden; height: 100vh; width: 100vw; }
+        .block-hundred { background: linear-gradient(145deg, #10b981, #059669); border: 2px solid #34d399; box-shadow: 3px 4px 0px #047857, inset 0px 2px 4px rgba(255,255,255,0.4); }
+        .block-ten { background: linear-gradient(145deg, #f59e0b, #d97706); border: 2px solid #fbbf24; box-shadow: 3px 4px 0px #b45309, inset 0px 2px 4px rgba(255,255,255,0.4); }
+        .block-one { background: linear-gradient(145deg, #3b82f6, #2563eb); border: 2px solid #60a5fa; box-shadow: 2px 3px 0px #1d4ed8, inset 0px 1.5px 3px rgba(255,255,255,0.4); }
+        .drop-zone { transition: all 0.2s ease; background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px); background-size: 16px 16px; }
+        .drop-zone.drag-over { background-color: rgba(99, 102, 241, 0.25) !important; border-color: #818cf8 !important; transform: scale(1.005); }
+        .draggable-item { cursor: grab; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+        .draggable-item:active { cursor: grabbing; transform: scale(1.08) rotate(2deg); z-index: 50; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 8px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 8px; }
+    </style>
+</head>
+<body class="flex flex-col h-screen w-screen overflow-hidden text-white p-2">
+    <header class="flex-none bg-slate-900/80 backdrop-blur-md border border-slate-700/60 rounded-2xl p-2 mb-2 shadow-2xl flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg ring-2 ring-white/20">
+                <i class="fa-solid fa-cubes-stacked text-xl text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-pink-300 to-amber-200">TAJUG BLOCK</h1>
+            </div>
+        </div>
+        <div class="flex items-center bg-slate-950/60 p-1 rounded-xl border border-slate-800 gap-1">
+            <button onclick="switchMode('add')" id="btn-mode-add" class="mode-btn px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all text-slate-400">
+                <i class="fa-solid fa-plus"></i><span>Penjumlahan</span>
+            </button>
+            <button onclick="switchMode('sub')" id="btn-mode-sub" class="mode-btn px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all bg-pink-600 text-white">
+                <i class="fa-solid fa-minus"></i><span>Pengurangan</span>
+            </button>
+            <button onclick="switchMode('free')" id="btn-mode-free" class="mode-btn px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all text-slate-400">
+                <i class="fa-solid fa-shapes"></i><span>Eksplorasi</span>
+            </button>
+        </div>
+        <button onclick="toggleAudio()" id="btn-audio" class="w-8 h-8 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400">
+            <i class="fa-solid fa-volume-high text-sm"></i>
+        </button>
+    </header>
+
+    <section class="flex-none bg-slate-900/60 border border-slate-800 rounded-2xl p-2 mb-2 shadow-xl flex flex-wrap items-center justify-between gap-2">
+        <div id="question-controls" class="flex items-center gap-2 flex-1"></div>
+        <div class="flex items-center gap-2 bg-slate-950/70 border border-slate-800 px-3 py-1 rounded-xl">
+            <span class="text-xs text-slate-400 font-semibold">Total:</span>
+            <span id="total-board-value" class="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-amber-300 to-blue-400 font-mono">0</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+            <button onclick="resetBoard()" class="px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 text-xs font-bold"><i class="fa-solid fa-rotate-left text-amber-400"></i> Reset</button>
+            <button id="btn-check-answer" onclick="checkAnswer()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-extrabold"><i class="fa-solid fa-circle-check"></i> Cek Hasil</button>
+        </div>
+    </section>
+
+    <main class="flex-1 grid grid-cols-3 gap-2 min-h-0 relative">
+        <div class="flex flex-col bg-slate-900/40 border-2 border-emerald-500/30 rounded-2xl p-2 overflow-hidden relative">
+            <div class="flex-none flex items-center justify-between bg-emerald-950/60 border border-emerald-500/40 px-2.5 py-1 rounded-xl mb-1.5">
+                <span class="font-extrabold text-xs text-emerald-300">RATUSAN</span>
+                <span id="count-hundreds" class="font-black text-emerald-200 text-sm">0</span>
+            </div>
+            <div id="zone-hundreds" data-place="hundreds" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" class="drop-zone flex-1 border-2 border-dashed border-emerald-500/20 rounded-xl p-1.5 flex flex-wrap content-start gap-1.5 overflow-y-auto custom-scroll relative">
+                <div id="hint-hundreds" class="absolute inset-0 flex flex-col items-center justify-center opacity-20 pointer-events-none text-emerald-400"><span class="text-xs font-semibold">1 Blok = 100</span></div>
+            </div>
+            <div class="flex-none pt-1.5 flex items-center justify-between border-t border-slate-800">
+                <div class="flex gap-1">
+                    <button onclick="addBlock('hundreds')" class="w-7 h-7 rounded-lg bg-emerald-600 text-white font-bold text-xs">+</button>
+                    <button onclick="removeBlock('hundreds')" class="w-7 h-7 rounded-lg bg-slate-800 text-emerald-400 font-bold text-xs">-</button>
+                </div>
+                <button id="btn-exchange-hundreds" onclick="exchangeHundredsToTens()" class="hidden px-2 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-bold">Tukar 10 ➔</button>
+            </div>
+        </div>
+
+        <div class="flex flex-col bg-slate-900/40 border-2 border-amber-500/30 rounded-2xl p-2 overflow-hidden relative">
+            <div class="flex-none flex items-center justify-between bg-amber-950/60 border border-amber-500/40 px-2.5 py-1 rounded-xl mb-1.5">
+                <span class="font-extrabold text-xs text-amber-300">PULUHAN</span>
+                <span id="count-tens" class="font-black text-amber-200 text-sm">0</span>
+            </div>
+            <div id="zone-tens" data-place="tens" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" class="drop-zone flex-1 border-2 border-dashed border-amber-500/20 rounded-xl p-1.5 flex flex-wrap content-start gap-1.5 overflow-y-auto custom-scroll relative">
+                <div id="hint-tens" class="absolute inset-0 flex flex-col items-center justify-center opacity-20 pointer-events-none text-amber-400"><span class="text-xs font-semibold">1 Batang = 10</span></div>
+            </div>
+            <div class="flex-none pt-1.5 flex items-center justify-between border-t border-slate-800">
+                <div class="flex gap-1">
+                    <button onclick="addBlock('tens')" class="w-7 h-7 rounded-lg bg-amber-600 text-white font-bold text-xs">+</button>
+                    <button onclick="removeBlock('tens')" class="w-7 h-7 rounded-lg bg-slate-800 text-amber-400 font-bold text-xs">-</button>
+                </div>
+                <div class="flex gap-1">
+                    <button id="btn-group-tens" onclick="groupTensToHundreds()" class="hidden px-1.5 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-bold">⬅ Gabung</button>
+                    <button id="btn-exchange-tens" onclick="exchangeTensToOnes()" class="hidden px-1.5 py-0.5 rounded-lg bg-blue-500/20 border border-blue-500/40 text-blue-300 text-[10px] font-bold">Tukar 10 ➔</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col bg-slate-900/40 border-2 border-blue-500/30 rounded-2xl p-2 overflow-hidden relative">
+            <div class="flex-none flex items-center justify-between bg-blue-950/60 border border-blue-500/40 px-2.5 py-1 rounded-xl mb-1.5">
+                <span class="font-extrabold text-xs text-blue-300">SATUAN</span>
+                <span id="count-ones" class="font-black text-blue-200 text-sm">0</span>
+            </div>
+            <div id="zone-ones" data-place="ones" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" class="drop-zone flex-1 border-2 border-dashed border-blue-500/20 rounded-xl p-1.5 flex flex-wrap content-start gap-1.5 overflow-y-auto custom-scroll relative">
+                <div id="hint-ones" class="absolute inset-0 flex flex-col items-center justify-center opacity-20 pointer-events-none text-blue-400"><span class="text-xs font-semibold">1 Kubus = 1</span></div>
+            </div>
+            <div class="flex-none pt-1.5 flex items-center justify-between border-t border-slate-800">
+                <div class="flex gap-1">
+                    <button onclick="addBlock('ones')" class="w-7 h-7 rounded-lg bg-blue-600 text-white font-bold text-xs">+</button>
+                    <button onclick="removeBlock('ones')" class="w-7 h-7 rounded-lg bg-slate-800 text-blue-400 font-bold text-xs">-</button>
+                </div>
+                <button id="btn-group-ones" onclick="groupOnesToTens()" class="hidden px-2 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-bold">⬅ Gabung 10</button>
+            </div>
+        </div>
+    </main>
+
+    <div id="modal-feedback" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-5 max-w-sm w-full text-center shadow-2xl">
+            <div id="modal-icon" class="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center text-2xl"></div>
+            <h3 id="modal-title" class="text-lg font-extrabold text-white mb-1 uppercase"></h3>
+            <p id="modal-msg" class="text-xs text-slate-300 mb-4 leading-relaxed"></p>
+            <button onclick="closeModal()" class="w-full py-2.5 rounded-xl bg-indigo-600 text-white font-extrabold text-xs">Mengerti</button>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'sub'; let num1 = 236; let num2 = 118; let targetValue = 118; let audioEnabled = true;
+        let state = { hundreds: 2, tens: 3, ones: 6 };
+        let audioCtx = null;
+
+        function initAudio() { if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } }
+        function playSound(type) {
+            if (!audioEnabled) return; initAudio();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination); const now = audioCtx.currentTime;
+            if (type === 'add') { osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); osc.frequency.exponentialRampToValueAtTime(800, now + 0.12); gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.12); osc.start(now); osc.stop(now + 0.12); }
+            else if (type === 'remove') { osc.type = 'triangle'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(200, now + 0.12); gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.12); osc.start(now); osc.stop(now + 0.12); }
+            else if (type === 'exchange') { osc.type = 'square'; osc.frequency.setValueAtTime(300, now); osc.frequency.setValueAtTime(500, now + 0.08); osc.frequency.setValueAtTime(700, now + 0.16); gain.gain.setValueAtTime(0.15, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.25); osc.start(now); osc.stop(now + 0.25); }
+            else if (type === 'correct') { 
+              const notes = [523.25, 659.25, 783.99, 1046.50];
+              notes.forEach((freq, idx) => {
+                const noteOsc = audioCtx.createOscillator();
+                const noteGain = audioCtx.createGain();
+                noteOsc.type = 'triangle';
+                noteOsc.frequency.setValueAtTime(freq, now + (idx * 0.12));
+                noteGain.gain.setValueAtTime(0.25, now + (idx * 0.12));
+                noteGain.gain.linearRampToValueAtTime(0.01, now + (idx * 0.12) + 0.25);
+                noteOsc.connect(noteGain);
+                noteGain.connect(audioCtx.destination);
+                noteOsc.start(now + (idx * 0.12));
+                noteOsc.stop(now + (idx * 0.12) + 0.25);
+              });
+            }
+            else if (type === 'wrong') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(220, now); osc.frequency.setValueAtTime(180, now + 0.15); gain.gain.setValueAtTime(0.25, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.3); osc.start(now); osc.stop(now + 0.3); }
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const btn = document.getElementById('btn-audio');
+            btn.innerHTML = audioEnabled ? '<i class="fa-solid fa-volume-high text-sm"></i>' : '<i class="fa-solid fa-volume-xmark text-sm"></i>';
+        }
+
+        function renderControlPanel() {
+            const container = document.getElementById('question-controls');
+            if (currentMode === 'sub') {
+                container.innerHTML = \`<div class="flex items-center gap-1.5"><label class="text-[11px] font-extrabold text-pink-300">Soal Pengurangan:</label><input type="number" id="input-num1" value="\${num1}" class="w-14 bg-slate-950 border border-slate-700 rounded-lg px-1.5 py-0.5 text-center font-mono font-bold text-xs text-white"><span class="font-extrabold text-slate-400 text-xs">-</span><input type="number" id="input-num2" value="\${num2}" class="w-14 bg-slate-950 border border-slate-700 rounded-lg px-1.5 py-0.5 text-center font-mono font-bold text-xs text-white"><span class="font-extrabold text-slate-400 text-xs">= ?</span><button onclick="applyCustomQuestion()" class="px-2 py-0.5 bg-pink-600 rounded-lg text-xs font-bold text-white">Set</button></div>\`;
+            } else if (currentMode === 'add') {
+                container.innerHTML = \`<div class="flex items-center gap-1.5"><label class="text-[11px] font-extrabold text-indigo-300">Soal Penjumlahan:</label><input type="number" id="input-num1" value="\${num1}" class="w-14 bg-slate-950 border border-slate-700 rounded-lg px-1.5 py-0.5 text-center font-mono font-bold text-xs text-white"><span class="font-extrabold text-slate-400 text-xs">+</span><input type="number" id="input-num2" value="\${num2}" class="w-14 bg-slate-950 border border-slate-700 rounded-lg px-1.5 py-0.5 text-center font-mono font-bold text-xs text-white"><span class="font-extrabold text-slate-400 text-xs">= ?</span><button onclick="applyCustomQuestion()" class="px-2 py-0.5 bg-indigo-600 rounded-lg text-xs font-bold text-white">Set</button></div>\`;
+            } else {
+                container.innerHTML = \`<div class="flex items-center gap-1.5"><label class="text-[11px] font-extrabold text-amber-300">Target Angka:</label><input type="number" id="input-target" value="\${targetValue}" class="w-16 bg-slate-950 border border-slate-700 rounded-lg px-2 py-0.5 text-center font-mono font-bold text-xs text-white"><button onclick="applyCustomQuestion()" class="px-2 py-0.5 bg-amber-600 rounded-lg text-xs font-bold text-white">Set Target</button></div>\`;
+            }
+        }
+
+        function switchMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.className = 'mode-btn px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all text-slate-400');
+            const activeBtn = document.getElementById('btn-mode-' + mode);
+            activeBtn.className = 'mode-btn px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all text-white ' + (mode==='add'?'bg-indigo-600':(mode==='sub'?'bg-pink-600':'bg-amber-600'));
+            generateRandomQuestion();
+        }
+
+        function generateRandomQuestion() {
+            if (currentMode === 'sub') { num1 = 236; num2 = 118; targetValue = 118; setBoardValue(num1); }
+            else if (currentMode === 'add') { num1 = 300; num2 = 150; targetValue = 450; setBoardValue(num1); }
+            else { targetValue = 250; setBoardValue(0); }
+            renderControlPanel(); playSound('add');
+        }
+
+        function applyCustomQuestion() {
+            if (currentMode === 'add' || currentMode === 'sub') {
+                const n1 = parseInt(document.getElementById('input-num1').value) || 0;
+                const n2 = parseInt(document.getElementById('input-num2').value) || 0;
+                num1 = Math.min(999, Math.max(0, n1));
+                num2 = Math.min(999, Math.max(0, n2));
+                targetValue = currentMode === 'add' ? num1 + num2 : num1 - num2;
+                setBoardValue(num1);
+            } else {
+                targetValue = parseInt(document.getElementById('input-target').value) || 0;
+                setBoardValue(0);
+            }
+            renderControlPanel(); playSound('add');
+        }
+
+        function setBoardValue(val) {
+            state.hundreds = Math.floor(val / 100);
+            state.tens = Math.floor((val % 100) / 10);
+            state.ones = val % 10;
+            renderBoard();
+        }
+
+        function addBlock(place) { state[place]++; playSound('add'); renderBoard(); }
+        function removeBlock(place) { if (state[place] > 0) { state[place]--; playSound('remove'); renderBoard(); } }
+        function resetBoard() { setBoardValue(currentMode === 'free' ? 0 : num1); playSound('remove'); }
+
+        function exchangeHundredsToTens() { if (state.hundreds >= 1) { state.hundreds--; state.tens += 10; playSound('exchange'); renderBoard(); } }
+        function exchangeTensToOnes() { if (state.tens >= 1) { state.tens--; state.ones += 10; playSound('exchange'); renderBoard(); } }
+        function groupTensToHundreds() { if (state.tens >= 10) { state.tens -= 10; state.hundreds++; playSound('exchange'); renderBoard(); } }
+        function groupOnesToTens() { if (state.ones >= 10) { state.ones -= 10; state.tens++; playSound('exchange'); renderBoard(); } }
+
+        function renderBoard() {
+            document.getElementById('count-hundreds').textContent = state.hundreds;
+            document.getElementById('count-tens').textContent = state.tens;
+            document.getElementById('count-ones').textContent = state.ones;
+            const total = (state.hundreds * 100) + (state.tens * 10) + state.ones;
+            document.getElementById('total-board-value').textContent = total;
+
+            document.getElementById('hint-hundreds').style.display = state.hundreds === 0 ? 'flex' : 'none';
+            document.getElementById('hint-tens').style.display = state.tens === 0 ? 'flex' : 'none';
+            document.getElementById('hint-ones').style.display = state.ones === 0 ? 'flex' : 'none';
+
+            document.getElementById('btn-exchange-hundreds').style.display = state.hundreds >= 1 ? 'inline-flex' : 'none';
+            document.getElementById('btn-exchange-tens').style.display = state.tens >= 1 ? 'inline-flex' : 'none';
+            document.getElementById('btn-group-tens').style.display = state.tens >= 10 ? 'inline-flex' : 'none';
+            document.getElementById('btn-group-ones').style.display = state.ones >= 10 ? 'inline-flex' : 'none';
+
+            renderHundredsZone(); renderTensZone(); renderOnesZone();
+        }
+
+        function renderHundredsZone() {
+            const container = document.getElementById('zone-hundreds');
+            container.innerHTML = '<div id="hint-hundreds" class="absolute inset-0 flex flex-col items-center justify-center opacity-20 pointer-events-none text-emerald-400"><span class="text-xs font-semibold">1 Blok = 100</span></div>';
+            for (let i = 0; i < state.hundreds; i++) {
+                const block = document.createElement('div'); block.draggable = true; block.className = 'draggable-item block-hundred w-14 h-14 rounded-lg grid grid-cols-10 grid-rows-10 p-0.5 gap-0.5';
+                block.ondragstart = (e) => handleDragStart(e, 'hundreds');
+                container.appendChild(block);
+            }
+        }
+
+        function renderTensZone() {
+            const container = document.getElementById('zone-tens');
+            container.innerHTML = '<div id="hint-tens" class="absolute inset-0 flex flex-col items-center justify-center opacity-20 pointer-events-none text-amber-400"><span class="text-xs font-semibold">1 Batang = 10</span></div>';
+            for (let i = 0; i < state.tens; i++) {
+                const block = document.createElement('div'); block.draggable = true; block.className = 'draggable-item block-ten w-5 h-16 rounded-md flex flex-col p-0.5 gap-0.5';
+                block.ondragstart = (e) => handleDragStart(e, 'tens');
+                container.appendChild(block);
+            }
+        }
+
+        function renderOnesZone() {
+            const container = document.getElementById('zone-ones');
+            container.innerHTML = '<div id="hint-ones" class="absolute inset-0 flex flex-col items-center justify-center opacity-20 pointer-events-none text-blue-400"><span class="text-xs font-semibold">1 Kubus = 1</span></div>';
+            for (let i = 0; i < state.ones; i++) {
+                const block = document.createElement('div'); block.draggable = true; block.className = 'draggable-item block-one w-5 h-5 rounded-md';
+                block.ondragstart = (e) => handleDragStart(e, 'ones');
+                container.appendChild(block);
+            }
+        }
+
+        let draggedType = null;
+        function handleDragStart(e, type) { draggedType = type; e.dataTransfer.setData('text/plain', type); }
+        function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+        function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+        function handleDrop(e) {
+            e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+            const targetPlace = e.currentTarget.dataset.place;
+            if (draggedType === 'hundreds' && targetPlace === 'tens') exchangeHundredsToTens();
+            else if (draggedType === 'tens' && targetPlace === 'ones') exchangeTensToOnes();
+            else if (draggedType === 'ones' && targetPlace === 'tens') groupOnesToTens();
+            else if (draggedType === 'tens' && targetPlace === 'hundreds') groupTensToHundreds();
+            draggedType = null;
+        }
+
+        function checkAnswer() {
+            const currentTotal = (state.hundreds * 100) + (state.tens * 10) + state.ones;
+            if (currentTotal === targetValue) {
+                playSound('correct');
+                showModal('luar biasa', 'Hasil penyusunan blok kamu sangat tepat!', 'correct');
+                if (typeof confetti === 'function') confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } else {
+                playSound('wrong');
+                showModal('periksa kembali', 'Nilai blok kamu saat ini adalah ' + currentTotal + '. Ayo sesuaikan lagi!', 'wrong');
+            }
+        }
+
+        function showModal(title, msg, type) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-msg').textContent = msg;
+            const modalIcon = document.getElementById('modal-icon');
+            modalIcon.innerHTML = type === 'correct' ? '🏆' : '🔒';
+            document.getElementById('modal-feedback').classList.remove('hidden');
+        }
+        function closeModal() { document.getElementById('modal-feedback').classList.add('hidden'); }
+
+        window.onload = function() { generateRandomQuestion(); };
+    <\/script>
+</body>
+</html>`;
+
+/* FUNGSI LOAD IFRAME POS 2 HASIL GABUNGAN */
+document.addEventListener("DOMContentLoaded", function() {
+  const frame = document.getElementById('tajugFrame');
+  if (frame) {
+    frame.contentWindow.document.open();
+    frame.contentWindow.document.write(tajugBlockSource);
+    frame.contentWindow.document.close();
+  }
+});
+
+/* FUNGSI UPLOAD VIDEO LOKAL */
+function loadLocalVideo(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const videoNode = document.getElementById('videoPemantik');
+    const fileURL = URL.createObjectURL(file);
+    videoNode.src = fileURL;
+    videoNode.play();
+  }
+}
+
+/* DATA SOAL ARENA BRANKAS POS 3 (SESUAI NOMOR KOTAK 1 - 15) */
+const SOAL = [
+  {teks:"Masyarakat Kudus menghormati ajaran Sunan Kudus dengan tidak menyembelih sapi, sehingga soto dibuat dari daging kerbau. Sebuah warung soto kerbau menyiapkan 378 mangkuk soto. Hingga siang hari, 256 mangkuk sudah terjual. Berapa mangkuk soto yang masih tersisa?", jawab:"122"},
+  {teks:"Falsafah Gusjigang (bagus, ngaji, dagang) diajarkan Sunan Kudus kepada masyarakat. Pak Ahmad, seorang pedagang jenang, membawa 749 bungkus jenang ke pasar. Hingga sore hari, 526 bungkus terjual. Berapa bungkus jenang yang belum terjual?", jawab:"223"},
+  {teks:"Menjelang Ramadan, Kudus mengadakan tradisi Dandangan. Pada tradisi tersebut terdapat 968 pedagang. Sebanyak 646 pedagang di antaranya menjual makanan, dan sisanya menjual barang lain. Berapa pedagang yang menjual barang lain?", jawab:"322"},
+  {teks:"Parijoto adalah buah khas lereng Gunung Muria yang dikenal sebagai salah satu tanaman khas daerah Kudus. Pak Slamet memetik 674 buah Parijoto. Sebanyak 400 buah sudah dijual, dan 52 buah dibagikan kepada tetangganya. Berapa buah Parijoto yang masih dimiliki Pak Slamet?", jawab:"222"},
+  {teks:"Rani berziarah ke Makam Sunan Muria dengan menaiki anak tangga. Misalkan jumlah anak tangga yang harus dilalui adalah 587. Rani sudah menaiki 364 anak tangga. Berapa anak tangga yang harus dinaiki Rani lagi?", jawab:"223"},
+  {teks:"Ibu Rukmini menjual garang asem, masakan tradisional yang sering ditemukan di Kudus. Ia membuat 634 bungkus garang asem. Pada siang hari, 218 bungkus sudah terjual. Pada sore hari, 205 bungkus lainnya juga terjual. Berapa bungkus garang asem yang belum terjual?", jawab:"211"},
+  {teks:"Situs Purbakala Patiayam di Kudus menyimpan fosil hewan purba dan menjadi tempat belajar sejarah bagi pelajar. Pada masa liburan sekolah, 825 pengunjung datang ke situs tersebut. Sebanyak 391 pengunjung di antaranya adalah pelajar, dan sisanya pengunjung umum. Berapa pengunjung umum yang datang?", jawab:"434"},
+  {teks:"Kudus dikenal sebagai kota kretek, dengan banyak pekerja yang melinting rokok secara manual. Seorang pelinting menyiapkan 759 batang rokok kretek. Pada pagi hari, 385 batang sudah dimasukkan ke dalam kemasan. Pada siang hari, 132 batang lainnya juga dimasukkan ke dalam kemasan. Berapa batang rokok kretek yang belum dikemas?", jawab:"242"},
+  {teks:"Padasan (tempat wudu tradisional dari gentong) menjadi salah satu ciri kompleks Menara Kudus. Pada hari Jumat, 856 jemaah datang ke kompleks tersebut. Sebanyak 429 jemaah sudah pulang setelah salat. Berapa jemaah yang masih berada di kompleks?", jawab:"427"},
+  {teks:"Masjid Wali At-Taqwa di Desa Loram Kulon merupakan salah satu masjid bersejarah di Kudus. Pada acara pengajian, 583 warga hadir. Sebanyak 267 warga di antaranya adalah ibu-ibu, dan sisanya bapak-bapak. Berapa warga yang berjenis bapak-bapak?", jawab:"316"},
+  {teks:"Kudus dikenal sebagai kota yang menjunjung tinggi toleransi antarumat beragama. Pada perayaan Imlek, Klenteng Hok Ling Bio menargetkan kunjungan 872 orang dalam sehari. Hingga siang hari, tercatat sudah ada 467 orang yang berkunjung. Berapa orang lagi yang dibutuhkan agar target kunjungan hari itu tercapai?", jawab:"405"},
+  {teks:"Warga menyiapkan 954 ketupat untuk tradisi Kupat Lepet di kawasan Colo. Pada pagi hari, 346 ketupat dibagikan kepada peziarah. Pada siang hari, 235 ketupat dibagikan kepada warga sekitar. Berapa ketupat yang masih tersisa?", jawab:"373"},
+  {teks:"Pasar Kliwon menjadi tempat masyarakat Kudus berjual beli kebutuhan sehari-hari. Pedagang A memiliki stok 760 kilogram beras, sedangkan Pedagang B memiliki stok 454 kilogram beras. Berapakah selisih stok beras antara Pedagang A dan Pedagang B?", jawab:"306"},
+  {teks:"Falsafah Gusjigang (bagus, ngaji, dagang) menekankan pentingnya mengaji. Sebuah madrasah diniyah di Kudus memiliki 807 santri. Sebanyak 326 santri di antaranya adalah santri putra, dan sisanya santri putri. Berapa santri putri di madrasah tersebut?", jawab:"481"},
+  {teks:"Ibu Siti adalah pengrajin bordir di Kudus. Ia menerima 986 lembar kain untuk dibordir. Pada minggu pertama, ia menyelesaikan 248 lembar. Pada minggu kedua, ia menyelesaikan 358 lembar. Berapa lembar kain yang belum selesai dibordir?", jawab:"380"}
+];
+
+let teams = [];
+let vaultLocked = new Array(SOAL.length).fill(false);
+let vaultTeamOpener = new Array(SOAL.length).fill(null);
+let currentVaultIndex = null;
+let currentInputStr = '';
+let selectedEmojiVal = '';
+let timerInterval = null;
+let timeInSeconds = 0;
+let isTimerPaused = false;
+
+function switchPos(posNum) {
+  document.querySelectorAll('.pos-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.map-node').forEach(n => n.classList.remove('active'));
+  document.getElementById('pos-' + posNum).classList.add('active');
+  document.getElementById('node-' + posNum).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+function renderTeamNameInputs() {
+  const n = parseInt(document.getElementById('inpJumlahTim').value, 10);
+  const wrap = document.getElementById('teamNamesWrap');
+  wrap.innerHTML = '';
+  for(let i=1; i<=n; i++) {
+    wrap.innerHTML += `<input type="text" id="namaTim${i}" value="Kelompok ${i}">`;
+  }
+}
+renderTeamNameInputs();
+
+function mulaiPermainan() {
+  const n = parseInt(document.getElementById('inpJumlahTim').value, 10);
+  teams = [];
+  for(let i=1; i<=n; i++) {
+    const val = document.getElementById('namaTim'+i).value.trim() || ('Kelompok '+i);
+    teams.push({nama: val, skor: 0});
+  }
+  
+  // Reset Kunci Brankas
+  vaultLocked = new Array(SOAL.length).fill(false);
+  vaultTeamOpener = new Array(SOAL.length).fill(null);
+
+  document.getElementById('screen-setup').classList.remove('active');
+  document.getElementById('screen-result').classList.remove('active');
+  document.getElementById('screen-arena').classList.add('active');
+  
+  timeInSeconds = (parseInt(document.getElementById('inpDurasi').value, 10) || 15) * 60;
+  isTimerPaused = false;
+  document.getElementById('btnPauseTimer').textContent = '⏸ Jeda';
+  
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (!isTimerPaused) {
+      let m = Math.floor(timeInSeconds / 60);
+      let s = timeInSeconds % 60;
+      document.getElementById('timerDisplay').textContent = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+      if (timeInSeconds <= 0) {
+        clearInterval(timerInterval);
+        tampilkanPapanSkorHasilMatch("⏱ Waktu pengerjaan kuis telah habis!");
+      }
+      timeInSeconds--;
+    }
+  }, 1000);
+
+  renderLeaderboard();
+  renderGridVault();
+}
+
+function togglePauseTimer() {
+  isTimerPaused = !isTimerPaused;
+  const btn = document.getElementById('btnPauseTimer');
+  if (isTimerPaused) {
+    btn.textContent = '▶ Lanjut';
+    btn.style.background = 'linear-gradient(135deg, var(--emerald), #00a86b)';
+    playGlobalBtnSound('pause');
+  } else {
+    btn.textContent = '⏸ Jeda';
+    btn.style.background = 'linear-gradient(135deg, var(--gold), #d97706)';
+    playGlobalBtnSound('resume');
+  }
+}
+
+function renderLeaderboard() {
+  const el = document.getElementById('leaderboard');
+  el.innerHTML = '';
+  teams.forEach(t => {
+    el.innerHTML += `<div class="team-chip">${t.nama}: ${t.skor} pts</div>`;
+  });
+}
+
+function renderGridVault() {
+  const grid = document.getElementById('gridVault');
+  grid.innerHTML = '';
+  SOAL.forEach((s, idx) => {
+    let grp = idx >= 10 ? 'grp-sulit' : (idx >= 5 ? 'grp-sedang' : '');
+    const locked = vaultLocked[idx];
+    grid.innerHTML += `
+      <div class="vault-card ${grp} ${locked ? 'locked' : ''}" onclick="${locked ? '' : 'bukaModalPassword(' + idx + ')'}">
+        <div class="num">#${idx+1}</div>
+        <div class="pts">${locked ? '🔒 ' + vaultTeamOpener[idx] : '20 PTS'}</div>
+      </div>
+    `;
+  });
+}
+
+function bukaModalPassword(idx) {
+  currentVaultIndex = idx;
+  currentInputStr = '';
+  document.getElementById('modalPassTitle').textContent = 'BRANKAS #' + (idx+1) + ' (20 PTS)';
+  document.getElementById('modalSoalText').textContent = SOAL[idx].teks;
+  document.getElementById('inputPassword').value = '';
+  
+  const sel = document.getElementById('selectTimJawab');
+  sel.innerHTML = '';
+  teams.forEach((t, i) => { sel.innerHTML += `<option value="${i}">${t.nama}</option>`; });
+  
+  const pad = document.getElementById('keyboardArea');
+  pad.innerHTML = '';
+  ['1','2','3','4','5','6','7','8','9','⌫','0','✔'].forEach(k => {
+    pad.innerHTML += `<button type="button" onclick="pressKey('${k}')">${k}</button>`;
+  });
+  openModal('modalPassword');
+}
+
+function pressKey(k) {
+  if (k === '⌫') { currentInputStr = currentInputStr.slice(0, -1); }
+  else if (k === '✔') { cekJawaban(); return; }
+  else { currentInputStr += k; }
+  document.getElementById('inputPassword').value = currentInputStr;
+}
+
+function cekJawaban() {
+  const idx = currentVaultIndex;
+  const tIdx = parseInt(document.getElementById('selectTimJawab').value, 10);
+  closeModal('modalPassword');
+  
+  if (currentInputStr.trim() === SOAL[idx].jawab) {
+    teams[tIdx].skor += 20;
+    vaultLocked[idx] = true;
+    vaultTeamOpener[idx] = teams[tIdx].nama;
+    playGlobalBtnSound('correct');
+    
+    // Pemicu Animasi Confetti Kemenangan saat Jawaban Benar
+    if (typeof confetti === 'function') {
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    }
+    
+    showQuizFeedback(true, 'AKSES DIIZINKAN', 'Brankas Terbuka oleh ' + teams[tIdx].nama + ' (+20 PTS)!');
+  } else {
+    playGlobalBtnSound('wrong');
+    showQuizFeedback(false, 'AKSES DITOLAK', 'Kode Password Salah. Silakan coba lagi!');
+  }
+  renderLeaderboard();
+  renderGridVault();
+}
+
+/* FUNGSI MENAMPILKAN SKOR AKHIR */
+function selesaiKuisAtauSelesaiWaktu() {
+  if (timerInterval) clearInterval(timerInterval);
+  tampilkanPapanSkorHasilMatch("Tantangan Kuis Selesai!");
+}
+
+function tampilkanPapanSkorHasilMatch(pesanPopup) {
+  if (timerInterval) clearInterval(timerInterval);
+  closeModal('modalPassword');
+  
+  const sortedTeams = [...teams].sort((a, b) => b.skor - a.skor);
+  const container = document.getElementById('finalLeaderboardList');
+  container.innerHTML = '';
+
+  const trophies = ['🥇 PERINGKAT 1', '🥈 PERINGKAT 2', '🥉 PERINGKAT 3'];
+  
+  sortedTeams.forEach((t, index) => {
+    let rankClass = index === 0 ? 'rank-1' : (index === 1 ? 'rank-2' : (index === 2 ? 'rank-3' : ''));
+    let badgeStr = index < 3 ? trophies[index] : `PERINGKAT ${index + 1}`;
+    
+    container.innerHTML += `
+      <div class="rank-item ${rankClass}">
+        <div>
+          <span style="display:block; font-size:11px; opacity:0.8;">${badgeStr}</span>
+          <span>${t.nama}</span>
+        </div>
+        <div style="font-size:20px; color:var(--gold); font-weight:900;">${t.skor} <span style="font-size:12px; color:#fff;">PTS</span></div>
+      </div>
+    `;
+  });
+
+  document.getElementById('screen-arena').classList.remove('active');
+  document.getElementById('screen-result').classList.add('active');
+
+  showQuizFeedback(true, 'PERTANDINGAN BERAKHIR', pesanPopup + " Lihat papan skor hasil pertandingan di bawah!");
+  
+  if (typeof confetti === 'function') {
+    confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 } });
+  }
+}
+
+/* POP-UP FEEDBACK KUIS POS 3 (SESUAI TITLE YANG DIPASSING) */
+function showQuizFeedback(isCorrect, titleText, message) {
+  const titleEl = document.getElementById('quizFeedbackTitle');
+  const msgEl = document.getElementById('quizFeedbackMsg');
+  const iconEl = document.getElementById('quizFeedbackIcon');
+
+  titleEl.textContent = titleText;
+  msgEl.textContent = message;
+
+  if (isCorrect) {
+    titleEl.style.color = '#00d68f';
+    iconEl.style.background = 'rgba(0, 214, 143, 0.2)';
+    iconEl.style.color = '#00d68f';
+    iconEl.innerHTML = '🏆';
+  } else {
+    titleEl.style.color = '#ff3b5c';
+    iconEl.style.background = 'rgba(255, 59, 92, 0.2)';
+    iconEl.style.color = '#ff3b5c';
+    iconEl.innerHTML = '🔒';
+  }
+  
+  openModal('modalQuizFeedback');
+}
+
+function openTeacherModal() { openModal('modalGuru'); }
+function cekPasswordGuru() {
+  if (document.getElementById('inputGuruPw').value === '1234') {
+    const area = document.getElementById('answerListArea');
+    area.style.display = 'block';
+    area.innerHTML = '';
+    SOAL.forEach((s, i) => {
+      area.innerHTML += `<div><b>Brankas #${i+1}:</b> Password = ${s.jawab}</div>`;
+    });
+  } else { alert('Password Guru Salah!'); }
+}
+
+function selectEmoji(el, val) {
+  document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedEmojiVal = val;
+}
+
+function generateSertifikat() {
+  const nama = document.getElementById('refNama').value.trim();
+  if (!nama) { alert('Silakan tuliskan namamu terlebih dahulu!'); return; }
+  document.getElementById('certNama').textContent = nama;
+  document.getElementById('certCard').style.display = 'block';
+  alert('✨ Selamat! Sertifikat Petualang Digital berhasil diterbitkan.');
+}
+</script>
+</body>
+</html>
